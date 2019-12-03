@@ -69,7 +69,11 @@ class IOClass:
         # Tile the data is desired
         #----------------------------------------------
         if tile:
-            self.DATA = self.DATA.isel(south_north=slice(ystart,yend), west_east=slice(xstart,xend))
+            if WRF:
+                self.DATA = self.DATA.isel(south_north=slice(ystart,yend), west_east=slice(xstart,xend))
+            else:
+                self.DATA = self.DATA.isel(lat=slice(ystart,yend), lon=slice(xstart,xend))
+
         self.ny = self.DATA.dims[northing]
         self.nx = self.DATA.dims[easting]
         self.time = self.DATA.dims['time']

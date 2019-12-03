@@ -282,11 +282,11 @@ class Grid:
         #-------------------------------------------------------------------------
 
         # Correct first layer
-        #self.correct_layer(0 ,first_layer_height)
+        self.correct_layer(0 ,first_layer_height)
 
         # First, the snowpack is remeshed
-        idx = 0
-        while (idx < self.get_number_snow_layers()-1):
+        idx = 1
+        while ((idx < self.get_number_snow_layers()-1) & (self.get_number_snow_layers()>5)):
 
             dT = np.abs(self.get_node_temperature(idx)-self.get_node_temperature(idx+1))
             dRho = np.abs(self.get_node_density(idx)-self.get_node_density(idx+1))
@@ -298,44 +298,45 @@ class Grid:
         
         print('++++++++++++++++++++')
         print(self.grid_info_screen(8))
+        
         # Correct first layer
-        self.correct_layer(0 ,first_layer_height)
+       # self.correct_layer(0 ,first_layer_height)
 
-        if (self.get_number_layers()==2) & (self.get_node_height(1)<minimum_snow_layer_height):
-                self.merge_nodes(0)
-        print(self.grid_info_screen(8))
+        #if (self.get_number_layers()==2) & (self.get_node_height(1)<minimum_snow_layer_height):
+        #        self.merge_nodes(0)
+        #print(self.grid_info_screen(8))
     
         # get the glacier depth 
-        hrest = self.get_total_height()-self.get_total_snowheight()
+        #hrest = self.get_total_height()-self.get_total_snowheight()
 
-        # get number of snow layers
-        idx = self.get_number_snow_layers()
+        ## get number of snow layers
+        #idx = self.get_number_snow_layers()
 
-        if (self.get_number_snow_layers()>0):
-            last_layer_height = np.maximum(minimum_snow_layer_height,self.get_node_height(self.get_number_snow_layers()-1))
-        else:
-            last_layer_height = minimum_snow_layer_height
+        #if (self.get_number_snow_layers()>0):
+        #    last_layer_height = np.maximum(minimum_snow_layer_height,self.get_node_height(self.get_number_snow_layers()-1))
+        #else:
+        #    last_layer_height = minimum_snow_layer_height
 
-        # then the glacier
-        while (idx < self.get_number_layers()):
+        ## then the glacier
+        #while (idx < self.get_number_layers()):
 
-            if (hrest>=last_layer_height):
-                # Correct first layer
-                self.correct_layer(idx,last_layer_height)
+        #    if (hrest>=last_layer_height):
+        #        # Correct first layer
+        #        self.correct_layer(idx,last_layer_height)
 
-                hrest = hrest - last_layer_height
+        #        hrest = hrest - last_layer_height
 
-                # Height for the next layer
-                last_layer_height = layer_stretching*last_layer_height
+        #        # Height for the next layer
+        #        last_layer_height = layer_stretching*last_layer_height
 
-            # if the last layer is smaller than the required height, then merge
-            # with the previous layer
-            elif ((hrest<last_layer_height)):
-                self.merge_nodes(idx-1)
+        #    # if the last layer is smaller than the required height, then merge
+        #    # with the previous layer
+        #    elif ((hrest<last_layer_height)):
+        #        self.merge_nodes(idx-1)
 
-            idx = idx+1
-        
-        print(self.grid_info_screen(8))
+        #    idx = idx+1
+        #
+        #print(self.grid_info_screen(8))
 
 #        for i in range(merge_max):
 #            # Get number of snow layers
@@ -482,35 +483,18 @@ class Grid:
 
         self.logger.debug('Remove melt energy')
 
-        # Convert melt (m w.e.q.) to m height
-        height_diff = float(melt) / (self.get_node_density(idx) / 1000.0)   # m (snow) - negative = melt
-
-        if height_diff != 0.0:
-            remove = True
-        else:
-            remove = False
-
-        while remove:
-
-            # How much energy required to melt first layer
-            melt_required = self.get_node_height(idx) * (self.get_node_density(idx) / 1000.0)
-
-            # How much energy is left
-            melt_rest = melt - melt_required
-
-            # If not enough energy to remove first layer, first layers height is reduced by melt height
-            if melt_rest <= 0:
-                self.set_node_height(idx, self.get_node_height(idx) - height_diff)
-                remove = False
-
-            # If entire layer is removed
-            else:
+        while melt>0:
+            # Get SWE of layer
+            SWE = self.get_node_height(idx) * (self.get_node_density(idx)/water_density)
+            # Remove melt from layer and set new snowheight
+            if (melt<SWE):
+                self.set_node_height(idx, (SWE-melt)/(self.get_node_density(idx)/water_density))
+                melt = 0.0
+            # remove layer otherwise and continue loop
+            elif (melt>=SWE):
                 self.remove_node([idx])
-                melt -= melt_required
-                height_diff = float(melt) / (self.get_node_density(idx) / 1000.0)
-                remove = True
+                melt = melt-SWE
 
-        # TOBI
         # Keep track of the fresh snow layer
         if (idx==0):
             self.set_fresh_snow_props_height(self.new_snow_height-melt)
@@ -520,7 +504,6 @@ class Grid:
     # Getter and setter functions
     #===============================================================================
 
-    # TOBI
     def set_fresh_snow_props(self, height, timestamp):
         """ Keeps track of the new snowheight """
         self.new_snow_height = height

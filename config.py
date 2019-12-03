@@ -7,8 +7,8 @@
 # SIMULATION PERIOD 
 #-----------------------------------
 # Zhadang
-time_start = '2009-01-01T06:00'
-time_end   = '2009-01-10T00:00'
+time_start = '2009-11-01T06:00'
+time_end   = '2010-06-10T00:00'
 
 # Hintereisferner
 #time_start = '2018-09-17T08:00'
@@ -22,8 +22,8 @@ time_end_str=(time_end[0:10]).replace('-','')
 
 data_path = './data/'                       
 # Zhadang example
-input_netcdf= 'Zhadang/Zhadang_ERA5_2009.nc'
-output_netcdf = 'Zhadang_ERA5_'+time_start_str+'-'+time_end_str+'.nc'
+input_netcdf= 'Zhadang/Zhadang_2009_2010.nc'
+output_netcdf = 'Zhadang_OLD_'+time_start_str+'-'+time_end_str+'.nc'
 # Hintereisferner example
 #input_netcdf= 'HEF/HEF_input.nc'
 #output_netcdf = 'HEF_'+time_start_str+'-'+time_end_str+'.nc'
@@ -87,8 +87,8 @@ force_use_N = False                                         # If cloud cover fra
 #-----------------------------------
 # SUBSET  (provide pixel values) 
 #-----------------------------------
-tile = False
-xstart = 20
-xend = 40
-ystart = 20
-yend = 40
+tile = True
+xstart = 3
+xend = 4
+ystart = 3
+yend = 4

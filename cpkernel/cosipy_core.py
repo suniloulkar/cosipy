@@ -148,7 +148,9 @@ def cosipy_core(DATA, indY, indX, GRID_RESTART=None, stake_names=None, stake_dat
     # TIME LOOP
     #--------------------------------------------
     logger.debug('Start time loop')
+    
     for t in np.arange(len(DATA.time)):
+
         # Check grid
         GRID.grid_check()
 
@@ -158,22 +160,23 @@ def cosipy_core(DATA, indY, indX, GRID_RESTART=None, stake_names=None, stake_dat
         # Calc fresh snow density
         density_fresh_snow = np.maximum(109.0+6.0*(T2[t]-273.16)+26.0*np.sqrt(U2[t]), 50.0)
 
+        # Derive snowfall [m] and rain rates [m w.e.]
         if (SNOWF is not None) and (RRR is not None):
             SNOWFALL = SNOWF[t]
-            RAIN = RRR[t]-SNOWFALL*(density_fresh_snow/ice_density) * 1000
+            RAIN = RRR[t]-SNOWFALL*(density_fresh_snow/ice_density) * 1000.0
         elif (SNOWF is not None):
             SNOWFALL = SNOWF[t]
         else:
             # Else convert total precipitation [mm] to snowheight [m]; liquid/solid fraction
             SNOWFALL = (RRR[t]/1000.0)*(ice_density/density_fresh_snow)*(0.5*(-np.tanh(((T2[t]-zero_temperature) - center_snow_transfer_function) * spread_snow_transfer_function) + 1.0))
-            RAIN = RRR[t]-SNOWFALL*(density_fresh_snow/ice_density) * 1000
+            RAIN = RRR[t]-SNOWFALL*(density_fresh_snow/ice_density) * 1000.0
 
         # if snowfall is smaller than the threshold
         if SNOWFALL<minimum_snow_layer_height:
             SNOWFALL = 0.0
 
         # if rainfall is smaller than the threshold
-        if RAIN<(minimum_snow_layer_height*(density_fresh_snow/ice_density)*1000):
+        if RAIN<(minimum_snow_layer_height*(density_fresh_snow/ice_density)*1000.0):
             RAIN = 0.0
 
         if SNOWFALL > 0.0:
@@ -218,27 +221,27 @@ def cosipy_core(DATA, indY, indX, GRID_RESTART=None, stake_names=None, stake_dat
         if LWin is not None:
             # Find new surface temperature (LW is used from the input file)
             fun, surface_temperature, lw_radiation_in, lw_radiation_out, sensible_heat_flux, latent_heat_flux, \
-                ground_heat_flux, sw_radiation_net, rho, Lv, Cs_t, Cs_q, q0, q2, qdiff, phi \
+                ground_heat_flux, sw_radiation_net, rho, Lv, Cs_t, Cs_q, q0, q2, phi \
                 = update_surface_temperature(GRID, alpha, z0, T2[t], RH2[t], PRES[t], G_resid, U2[t], SLOPE, LWin=LWin[t])
         else:
             # Find new surface temperature (LW is parametrized using cloud fraction)
             fun, surface_temperature, lw_radiation_in, lw_radiation_out, sensible_heat_flux, latent_heat_flux, \
-                ground_heat_flux, sw_radiation_net, rho, Lv, Cs_t, Cs_q, q0, q2, qdiff, phi \
+                ground_heat_flux, sw_radiation_net, rho, Lv, Cs_t, Cs_q, q0, q2, phi \
                 = update_surface_temperature(GRID, alpha, z0, T2[t], RH2[t], PRES[t], G_resid, U2[t], SLOPE, N=N[t])
 
         #--------------------------------------------
         # Surface mass fluxes [m w.e.q.]
         #--------------------------------------------
         if surface_temperature < zero_temperature:
-            sublimation = min(latent_heat_flux / (1000.0 * lat_heat_sublimation), 0) * dt
-            deposition = max(latent_heat_flux / (1000.0 * lat_heat_sublimation), 0) * dt
+            sublimation = min(latent_heat_flux / (water_density * lat_heat_sublimation), 0) * dt
+            deposition = max(latent_heat_flux / (water_density * lat_heat_sublimation), 0) * dt
             evaporation = 0
             condensation = 0
         else:
             sublimation = 0
             deposition = 0
-            evaporation = min(latent_heat_flux / (1000.0 * lat_heat_vaporize), 0) * dt
-            condensation = max(latent_heat_flux / (1000.0 * lat_heat_vaporize), 0) * dt
+            evaporation = min(latent_heat_flux / (water_density * lat_heat_vaporize), 0) * dt
+            condensation = max(latent_heat_flux / (water_density * lat_heat_vaporize), 0) * dt
 
         #--------------------------------------------
         # Melt process - mass changes of snowpack (melting, sublimation, deposition, evaporation, condensation)
@@ -248,11 +251,11 @@ def cosipy_core(DATA, indY, indX, GRID_RESTART=None, stake_names=None, stake_dat
                           sensible_heat_flux + latent_heat_flux)
 
         # Convert melt energy to m w.e.q.
-        melt = melt_energy * dt / (1000 * lat_heat_melting)
+        melt = melt_energy * dt / (water_density * lat_heat_melting)
 
         # Remove melt [m w.e.q.]
         GRID.remove_melt_weq(melt - sublimation - deposition - evaporation)
-        
+
         #--------------------------------------------
         # Percolation
         #--------------------------------------------

@@ -6,7 +6,7 @@
 ' GENERAL INFORMATION ' 
 dt = 3600                                       # Time step in the input files [s]
 max_layers = 200                                # Max. number of layers, just for the restart file
-
+z = 2.0                                         # Measurement height [m]
 
 ' PARAMETERIZATIONS '
 albedo_method = 'Oerlemans98'                   # possibilities: 'Oerlemans98'
@@ -40,7 +40,7 @@ minimum_snow_layer_height = 0.001               # minimum layer height
 
 
 ' REMESHING OPTIONS'
-remesh_method = 'log_profile'                   # Remeshing (log_profile or adaptive_profile)
+remesh_method = 'adaptive_profile'                   # Remeshing (log_profile or adaptive_profile)
 first_layer_height = 0.02                       # The first layer will always have the defined height (m)
 layer_stretching = 1.10                         # Stretching factor used by the log_profile method (e.g. 1.1 mean the subsequent layer is 10% greater than the previous
 
