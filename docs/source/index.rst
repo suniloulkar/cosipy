@@ -10,6 +10,7 @@ Welcome to cosipy's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   includeme
    Documentation
    Application
    modules
