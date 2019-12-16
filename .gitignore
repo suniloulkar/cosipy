@@ -1,5 +1,6 @@
 .idea/
 venv/
+__pycache__
 __pycache__/*
 modules/__pycache__/
 cpkernel/__pycache__/

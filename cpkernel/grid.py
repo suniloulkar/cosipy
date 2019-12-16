@@ -286,11 +286,25 @@ class Grid:
 
         # First, the snowpack is remeshed
         idx = 1
-        while ((idx < self.get_number_snow_layers()-1) & (self.get_number_snow_layers()>5)):
+        while ((idx < self.get_number_snow_layers()-1)):
 
             dT = np.abs(self.get_node_temperature(idx)-self.get_node_temperature(idx+1))
             dRho = np.abs(self.get_node_density(idx)-self.get_node_density(idx+1))
 
+            #if (self.get_node_height(idx),first_layer_height):
+            #    self.correct_layer(0 ,first_layer_height)
+            if ((dT<temperature_threshold_merging) & (dRho<density_threshold_merging)) | (self.get_node_height(idx)<minimum_snow_layer_height):
+                self.merge_nodes(idx)
+            else:
+                idx += 1
+        
+        while ((idx < self.get_number_layers()-1)):
+
+            dT = np.abs(self.get_node_temperature(idx)-self.get_node_temperature(idx+1))
+            dRho = np.abs(self.get_node_density(idx)-self.get_node_density(idx+1))
+
+            #if (self.get_node_height(idx),first_layer_height):
+            #    self.correct_layer(0 ,first_layer_height)
             if ((dT<temperature_threshold_merging) & (dRho<density_threshold_merging)) | (self.get_node_height(idx)<minimum_snow_layer_height):
                 self.merge_nodes(idx)
             else:
@@ -298,83 +312,6 @@ class Grid:
         
         print('++++++++++++++++++++')
         print(self.grid_info_screen(8))
-        
-        # Correct first layer
-       # self.correct_layer(0 ,first_layer_height)
-
-        #if (self.get_number_layers()==2) & (self.get_node_height(1)<minimum_snow_layer_height):
-        #        self.merge_nodes(0)
-        #print(self.grid_info_screen(8))
-    
-        # get the glacier depth 
-        #hrest = self.get_total_height()-self.get_total_snowheight()
-
-        ## get number of snow layers
-        #idx = self.get_number_snow_layers()
-
-        #if (self.get_number_snow_layers()>0):
-        #    last_layer_height = np.maximum(minimum_snow_layer_height,self.get_node_height(self.get_number_snow_layers()-1))
-        #else:
-        #    last_layer_height = minimum_snow_layer_height
-
-        ## then the glacier
-        #while (idx < self.get_number_layers()):
-
-        #    if (hrest>=last_layer_height):
-        #        # Correct first layer
-        #        self.correct_layer(idx,last_layer_height)
-
-        #        hrest = hrest - last_layer_height
-
-        #        # Height for the next layer
-        #        last_layer_height = layer_stretching*last_layer_height
-
-        #    # if the last layer is smaller than the required height, then merge
-        #    # with the previous layer
-        #    elif ((hrest<last_layer_height)):
-        #        self.merge_nodes(idx-1)
-
-        #    idx = idx+1
-        #
-        #print(self.grid_info_screen(8))
-
-#        for i in range(merge_max):
-#            # Get number of snow layers
-#            nlayers = self.get_number_snow_layers()
-#
-#            # Check if there are at least two layers
-#            if nlayers > 1:
-#
-#                # Calc differences between a layer and the subsequent layer
-#                dT = np.diff(self.get_temperature()[0:nlayers])
-#                dRho = np.diff(self.get_density()[0:nlayers])
-#
-#                # Sort the by differences in ascending order, and merge if criteria is met
-#                ind = np.lexsort((abs(dRho),abs(dT)))
-#                if ( (abs(dT[ind[0]])<temperature_threshold_merging) & (abs(dRho[ind[0]])<density_threshold_merging) ):
-#                    self.merge_nodes(ind[0])
-#
-#        
-#        # New layer height by adding up the height of the two layers
-#        total_height = self.get_node_height(idx)
-#
-#        # Merge subsequent layer with underlying layers until height of the layer is greater than the given height
-#        while ((total_height<min_height) & (idx+1<self.get_number_layers())):
-#            if (self.get_node_density(idx)<snow_ice_threshold) & (self.get_node_density(idx+1)<snow_ice_threshold):
-#                self.merge_nodes(idx)
-#            elif (self.get_node_density(idx)>=snow_ice_threshold) & (self.get_node_density(idx+1)>=snow_ice_threshold):
-#                self.merge_nodes(idx)
-#            else:
-#                break
-#
-#            # Recalculate total height
-#            total_height = self.get_node_height(idx)
-#
-#        print('before', self.grid_info_screen(10))
-#        self.correct_layer(0 ,first_layer_height)
-#        print(self.grid_info_screen(10))
-#
-#        self.check('MERGE')
 
 
 
