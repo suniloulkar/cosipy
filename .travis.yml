@@ -2,7 +2,6 @@ language: python
 
 # Specify Python versions
 python:
-  - "3.4"
   - "3.5"
   - "3.6"
   - "3.7"
@@ -19,7 +18,7 @@ install:
 
 # command to run tests
 script:
-  - pytest
+  - coverage run -m --source=. pytest 
   - python COSIPY.py
 
 # Push the results back to coveralls
