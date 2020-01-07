@@ -1,7 +1,7 @@
 numpy
 scipy
 xarray
-"distributed<=2.6"
+distributed<=2.6
 dask_jobqueue
 netcdf4
 coveralls
