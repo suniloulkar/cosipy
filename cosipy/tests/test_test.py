@@ -1,0 +1,2 @@
+import COSIPY
+COSIPY.main()
