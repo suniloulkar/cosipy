@@ -8,7 +8,7 @@
 #-----------------------------------
 # Zhadang
 time_start = '2009-03-01T06:00'
-time_end   = '2009-08-01T06:00'
+time_end   = '2009-07-01T06:00'
 
 # Hintereisferner
 #time_start = '2018-09-17T08:00'
