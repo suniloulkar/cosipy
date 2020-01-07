@@ -2,9 +2,13 @@
 
 Documentation
 -------------
-
 The documentation for COSIPY is available at the following link:
 https://cosipy.readthedocs.io/en/latest/
+
+Communication and Support
+-------------------------
+We are using the groupware slack communication (inform about new releases, bugs, features, ..) and for support:
+https://cosipy.slack.com
 
 About
 -----
