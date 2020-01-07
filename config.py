@@ -7,7 +7,7 @@
 # SIMULATION PERIOD 
 #-----------------------------------
 # Zhadang
-time_start = '2009-01-01T06:00'
+time_start = '2009-03-01T06:00'
 time_end   = '2009-08-01T06:00'
 
 # Hintereisferner
